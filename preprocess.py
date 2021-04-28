@@ -8,11 +8,11 @@ from datetime import datetime
 
 # Dataset of different chess opening statistics from online Chess site
 # Source: https://www.kaggle.com/arashnic/chess-opening-dataset
-openings_df = pd.read_csv("/Users/hunter/Downloads/INFO 3300 HW/project 2/high_elo_opening.csv")
+openings_df = pd.read_csv("high_elo_opening.csv")
 
 # Dataset for analyzing moves of 12 top players, listed names at chess.com/games
 # Source: https://www.kaggle.com/liury123/chess-game-from-12-top-players
-masters_df = pd.read_csv("/Users/hunter/Downloads/INFO 3300 HW/project 2/game_data.csv")
+masters_df = pd.read_csv("game_data.csv")
 
 ### Plan - utilize openings as main statistics, add filtering for different rated/skilled players
 # openings_df usage: Effectiveness of certain openings, determine next best move after specific opening, player's average skill
@@ -24,24 +24,25 @@ masters_df = pd.read_csv("/Users/hunter/Downloads/INFO 3300 HW/project 2/game_da
 first_move = openings_df["move1w"].unique()
 output_df = pd.DataFrame(index=first_move)
 
-# Construct first move/white winning odds column
+# Construct first move winning odds column, move count column, and percent draw column from online dataset
 # Utilizing aggregation code from https://www.kaggle.com/arashnic/first-moves-analysis?scriptVersionId=48542202
-white_1_stats = openings_df.groupby('move1w').agg({'white_wins' : np.sum, 'black_wins':np.sum})
-white_1_stats['white_odds'] = white_1_stats['white_wins'] / white_1_stats['black_wins'] 
-white_1_stats = white_1_stats.sort_values('white_odds', ascending = False)
+white_1_stats = openings_df.groupby('move1w').agg({'num_games': np.sum, 'white_wins' : np.sum, 'black_wins':np.sum, 'perc_draw':np.average})
+white_1_stats['white_odds'] = white_1_stats['white_wins'] / white_1_stats['black_wins']
 for move in first_move:
-    output_df.loc[move, 'white_odds'] = white_1_stats.loc[move, 'white_odds'].round(5)
+    output_df.loc[move, 'online_white_odds'] = white_1_stats.loc[move, 'white_odds'].round(4)
+    output_df.loc[move, 'online_w1_move_per_1000'] = (white_1_stats.loc[move, 'num_games'] / white_1_stats['num_games'].sum()).round(7)*1000
+    output_df.loc[move, 'online_w1_avg_draw'] = white_1_stats.loc[move, 'perc_draw'].round(4)
 
-# Construct top player first move count column, base only off wins by color
-masters_df = masters_df.loc[masters_df["result"] == "Win"]
+# Construct master player first move count (if moving first) and winrate column
+masters_df_wins = masters_df.loc[masters_df["result"] == "Win"]
 masters_df['white_1'] = masters_df.lines.str.split(" 2.").str[0].str.split(" ").str[1]
 masters_df['black_1'] = masters_df.lines.str.split(" 2.").str[0].str.split(" ").str[2]
 white_1_masters = masters_df.loc[masters_df["color"] == "White"]['white_1'].value_counts()
 for move in first_move:
     if move not in white_1_masters:
-        output_df.loc[move, 'master_white_use_count'] = 0
+        output_df.loc[move, 'master_w1_move_per_1000'] = 0
     else:
-        output_df.loc[move, 'master_white_use_count'] = white_1_masters[move]
+        output_df.loc[move, 'master_w1_move_per_1000'] = (white_1_masters[move] / white_1_masters.sum())*1000
 
 # 10 best black responses, top player responses
 print(output_df)
