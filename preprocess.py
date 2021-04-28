@@ -38,11 +38,15 @@ masters_df_wins = masters_df.loc[masters_df["result"] == "Win"]
 masters_df['white_1'] = masters_df.lines.str.split(" 2.").str[0].str.split(" ").str[1]
 masters_df['black_1'] = masters_df.lines.str.split(" 2.").str[0].str.split(" ").str[2]
 white_1_masters = masters_df.loc[masters_df["color"] == "White"]['white_1'].value_counts()
+master_moves = masters_df.groupby('white_1').agg({'moves': np.average})
 for move in first_move:
     if move not in white_1_masters:
-        output_df.loc[move, 'master_w1_move_per_1000'] = 0
+        output_df.loc[move, 'master_w1_move_per_1000'] = "N/A"
+        output_df.loc[move, 'master_w1_game_length'] = "N/A"
+
     else:
-        output_df.loc[move, 'master_w1_move_per_1000'] = (white_1_masters[move] / white_1_masters.sum())*1000
+        output_df.loc[move, 'master_w1_move_per_1000'] = (white_1_masters[move] / white_1_masters.sum()).round(7)*1000
+        output_df.loc[move, 'master_w1_game_length'] = master_moves.loc[move, 'moves'].round(4)
 
 # 10 best black responses, top player responses
 print(output_df)
