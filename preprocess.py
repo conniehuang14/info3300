@@ -49,7 +49,6 @@ for move in first_move:
         output_df.loc[move, 'master_w1_game_length'] = master_moves.loc[move, 'moves'].round(4)
 
 # 10 best black responses, top player responses
-print(output_df)
 for move in first_move:
     # Utilizing aggregation code from https://www.kaggle.com/arashnic/first-moves-analysis?scriptVersionId=48542202
     move_stats = openings_df[openings_df['move1w']==move].groupby('move1b').agg({'white_wins' : np.sum, 'black_wins':np.sum})
@@ -58,9 +57,12 @@ for move in first_move:
 
 
 
-# Convert column types to int for easy handling
+# Convert column types to int for easy handling (if needed)
 #for col in [list of count cols]:
 #    output_df[col] = output_df[col].astype('int64')
 
+# Name axis first_move for referencing in csv
+output_df = output_df.rename_axis("first_move")
+
 # export as csv
-#output_df.to_csv('processed_chess.csv')
+output_df.to_csv('processed_chess.csv')
