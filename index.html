@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <title>Project 2</title>
+
+    <style>
+
+
+    </style>
+
+</head>
+
+<body>
+    <h3>Connie Huang ch653, Hunter Greene hjg43</h3>
+
+    <p>
+
+    <svg id="chessboard1" height="800" width="800" />
+
+    <script>
+    const chessboard1 = d3.select("svg#chessboard1");
+    const width1 = chessboard1.attr("width");
+    const height1 = chessboard1.attr("height");
+    const margins1 = {"top": 60, "right": 60, "bottom": 60, "left": 60};
+    const chartWidth1 = width1 - margins1.left - margins1.right;
+    const chartHeight1 = height1 - margins1.top - margins1.bottom;
+
+
+    const requestData = async function() {
+
+      const data = await d3.csv("/processed_chess.csv");
+
+      console.log(data);
+
+      let chartArea = chessboard1.append("g")
+                                 .attr("id", "chessboard1")
+                                 .attr("transform","translate("+margins1.left+","+margins1.top+")");
+
+      let annotations = chessboard1.append("g").attr("id","annotations");
+
+      const axes = [0, 80, 160, 240, 320, 400, 480, 560];
+      const axes2 = [0, 80, 160, 240, 320, 400, 480, 560];
+      const row1 = [80, 240, 400, 560];
+      const row2 = [0, 160, 320, 480];
+
+      axes.forEach( (d) => {
+          axes.forEach( (k) => {
+         chartArea.append('rect')
+                    .attr('x', d)
+                    .attr('y', k)
+                    .attr('width', 80)
+                    .attr('height', 80)
+                    .attr('stroke', 'black')
+                    .attr('fill', 'white');
+        })
+      });
+
+
+      row1.forEach( (d) => {
+          row2.forEach( (k) => {
+         chartArea.append('rect')
+                    .attr('x', d)
+                    .attr('y', k)
+                    .attr('width', 80)
+                    .attr('height', 80)
+                    .attr('stroke', 'black')
+                    .attr('fill', '#d3d3d3');
+        })
+      });
+
+      row2.forEach( (d) => {
+          row1.forEach( (k) => {
+         chartArea.append('rect')
+                    .attr('x', d)
+                    .attr('y', k)
+                    .attr('width', 80)
+                    .attr('height', 80)
+                    .attr('stroke', 'black')
+                    .attr('fill', '#d3d3d3');
+        })
+      });
+
+      const axis_label = [40, 120, 200, 280, 360, 440, 520, 600];
+      const numbers = ['8', '7', '6', '5', '4', '3', '2', '1'];
+      const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+      axis_label.forEach( (d,i) => {
+          annotations.append("text")
+                     .attr("class", "y axis label")
+                     .attr("x", 0)
+                     .attr("y", d)
+                     .text(numbers[i])
+                     .attr("dominant-baseline", "middle")
+                     .attr("transform", `translate(${margins1.left-30},${margins1.top})`);
+      })
+
+      axis_label.forEach( (d,i) => {
+          annotations.append("text")
+                     .attr("class", "y axis label")
+                     .attr("x", chartWidth1+10)
+                     .attr("y", d)
+                     .text(numbers[i])
+                     .attr("dominant-baseline", "middle")
+                     .attr("transform", `translate(${margins1.left-30},${margins1.top})`);
+      })
+
+      axis_label.forEach( (d,i) => {
+          annotations.append("text")
+                     .attr("class", "x axis label")
+                     .attr("x", d)
+                     .attr("y", chartWidth1-5)
+                     .text(letters[i])
+                     .attr("dominant-baseline", "middle")
+                     .attr("text-anchor", 'middle')
+                     .attr("transform", `translate(${margins1.left},${margins1.top})`);
+      })
+
+      axis_label.forEach( (d,i) => {
+          annotations.append("text")
+                     .attr("class", "x axis label")
+                     .attr("x", d)
+                     .attr("y", -20)
+                     .text(letters[i])
+                     .attr("dominant-baseline", "middle")
+                     .attr("text-anchor", 'middle')
+                     .attr("transform", `translate(${margins1.left},${margins1.top})`);
+      })
+
+
+
+
+
+
+    }; // end of async function
+    requestData();
+
+    </script>
+
+    </p>
+
+
+</body>
+
+</html>
