@@ -6,7 +6,6 @@
 
     <style>
 
-
     </style>
 
 </head>
@@ -14,7 +13,7 @@
 <body>
     <h1>New York City Property Prices and Rat Sightings</h1>
     <h2>Visualization Created By: Connie Huang (ch653) and Hunter Greene (hjg43)</h2>
-    <svg id="nyc" height="610" width="975"></svg>
+    <svg id="nyc" height="610" width="975" style="border: 2px gray solid"></svg>
 
     <script>
     
@@ -28,13 +27,27 @@
     const map = svg.append("g").attr("transform",`translate(${margin.left},${margin.top})`);
     
     // Use async function to build map
-        const requestData = async function() {
-            // const nycdata = await d3.json("nyc_processed.csv");
-            // console.log(nycdata);
-            
-        }
+    const requestData = async function() {
+        // Retreive data
+        // Rat Sighting data source: https://www.kaggle.com/new-york-city/nyc-rat-sightings
+        rat_data = await d3.csv("rat_data.csv");
+        // sale_data = await d3.csv("sale_data.csv");
+        console.log(rat_data);
 
-        requestData();
+        // NOTE - - - NEED NYC json! Ideally split by zip codes
+        // projection and path of nyc 
+        var projection;
+        // var path = d3.geoPath().projection(projection);
+
+        // NOTE  - - - Depending on how we map out nyc, we can count #rats by zip/borough in the foreach loop below (could be good for an additional barplot/pie chart)
+        rat_data.forEach( (d, i) => {
+            // use projection to convert longitude and latitude into pixels
+            // d.position = projection( [d.longitude, d.latitude])
+
+        });
+
+    }
+    requestData();
     </script>
 
 </body></html>
