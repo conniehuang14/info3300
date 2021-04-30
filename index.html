@@ -18,7 +18,7 @@
 
     <p>
 
-    <svg id="chessboard1" height="800" width="800" />
+    <svg id="chessboard1" height="800" width="800" ></svg>
 
     <script>
     const chessboard1 = d3.select("svg#chessboard1");
@@ -45,19 +45,24 @@
       const axes2 = [0, 80, 160, 240, 320, 400, 480, 560];
       const row1 = [80, 240, 400, 560];
       const row2 = [0, 160, 320, 480];
+      const axis_label = [40, 120, 200, 280, 360, 440, 520, 600];
+      const numbers = ['8', '7', '6', '5', '4', '3', '2', '1'];
+      const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
-      axes.forEach( (d) => {
-          axes.forEach( (k) => {
-         chartArea.append('rect')
-                    .attr('x', d)
-                    .attr('y', k)
+
+      for(let x = 0; x < 8; x++) {
+        for(let y = 0; y < 8; y++) {
+           let id = letters[x].concat(numbers[y]);
+           chartArea.append('rect')
+                    .attr('id', id)
+                    .attr('x', axes[x])
+                    .attr('y', axes[y])
                     .attr('width', 80)
                     .attr('height', 80)
                     .attr('stroke', 'black')
-                    .attr('fill', 'white');
-        })
-      });
-
+                    .attr('fill', 'white'); 
+        } 
+       }
 
       row1.forEach( (d) => {
           row2.forEach( (k) => {
@@ -82,10 +87,6 @@
                     .attr('fill', '#d3d3d3');
         })
       });
-
-      const axis_label = [40, 120, 200, 280, 360, 440, 520, 600];
-      const numbers = ['8', '7', '6', '5', '4', '3', '2', '1'];
-      const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
       axis_label.forEach( (d,i) => {
           annotations.append("text")
