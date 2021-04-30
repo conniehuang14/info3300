@@ -12,3 +12,5 @@ output_df = pd.DataFrame(data={'year' : rat_df['Year'], 'borough': [x.lower() fo
 output_df = output_df.rename_axis("id")
 
 output_df.to_csv('rat_data.csv')
+
+# NYC Property Sales source: https://www.kaggle.com/johnshuford/new-york-city-property-sales
