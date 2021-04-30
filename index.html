@@ -131,7 +131,7 @@
 
       const chesspieces = ['♔','♕','♖','♘','♙','♚','♛','♜','♝','♞','♟︎'];
       const chesspieces_black = ['♜', '♞','♝','♛','♚','♝','♞','♜'];
-      const chesspieces_white = ['♖','♘','♙','♕','♔','♙','♘','♖'];
+      const chesspieces_white = ['♖','♘','♗','♕','♔','♗','♘','♖'];
 
       // row of black pieces
       for(let x = 0; x < 8; x++) {
@@ -187,14 +187,20 @@
 
           // mouseover interactions
           const opening_pawns = ['#pieceA2','#pieceB2', '#pieceC2','#pieceD2',
-          '#pieceE2','#pieceF2','#pieceG2','#pieceH2',];
-          const opening_space = ['rect#A3', 'rect#B3', 'rect#C3', 'rect#D3',
-          'rect#E3', 'rect#F3', 'rect#G3', 'rect#H3', ];
+          '#pieceE2','#pieceF2','#pieceG2','#pieceH2'];
+          const opening_space_row3 = ['rect#A3', 'rect#B3', 'rect#C3', 'rect#D3',
+          'rect#E3', '', 'rect#G3', 'rect#H3'];
+          const opening_space_row4 = ['', '', 'rect#C4', 'rect#D4',
+          'rect#E4', 'rect#F4', 'rect#G4', 'rect#H4'];
 
           const pawn_probability = [];
           opening_pawns.forEach( (d,i) => {
               d3.select(d).on("mouseover", function() {
-                  d3.select(opening_space[i])
+                  d3.select(opening_space_row3[i])
+                    .attr("fill","green")
+                    .attr("opacity", .5)
+                    .raise();
+                  d3.select(opening_space_row4[i])
                     .attr("fill","green")
                     .attr("opacity", .5)
                     .raise();
@@ -209,14 +215,16 @@
                              .attr("text-anchor", 'middle')
                              .attr("dominant-baseline", "middle")
                              .text(data[i].online_white_odds);
-                  d3.select(pawn_probability[i])
-                    .style("visibility",'visible')
-                    .raise();
-                    console.log(pawn_probability[i]);
+                    d3.select(pawn_probability[i])
+                      .style("visibility",'visible')
+                      .raise();
               })
 
               d3.select(d).on("mouseout", function() {
-                  d3.select(opening_space[i])
+                  d3.select(opening_space_row3[i])
+                    .attr("fill","none")
+                    .raise();
+                  d3.select(opening_space_row4[i])
                     .attr("fill","none")
                     .raise();
                   d3.select(this)
