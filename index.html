@@ -42,7 +42,6 @@
       let annotations = chessboard1.append("g").attr("id","annotations");
 
       const axes = [0, 80, 160, 240, 320, 400, 480, 560];
-      const axes2 = [0, 80, 160, 240, 320, 400, 480, 560];
       const row1 = [80, 240, 400, 560];
       const row2 = [0, 160, 320, 480];
       const axis_label = [40, 120, 200, 280, 360, 440, 520, 600];
@@ -60,31 +59,31 @@
                     .attr('width', 80)
                     .attr('height', 80)
                     .attr('stroke', 'black')
-                    .attr('fill', 'white'); 
-        } 
+                    .attr('fill', 'white');
+            }
        }
 
       row1.forEach( (d) => {
           row2.forEach( (k) => {
-         chartArea.append('rect')
-                    .attr('x', d)
-                    .attr('y', k)
-                    .attr('width', 80)
-                    .attr('height', 80)
-                    .attr('stroke', 'black')
-                    .attr('fill', '#d3d3d3');
+              chartArea.append('rect')
+                        .attr('x', d)
+                        .attr('y', k)
+                        .attr('width', 80)
+                        .attr('height', 80)
+                        .attr('stroke', 'black')
+                        .attr('fill', '#d3d3d3');
         })
       });
 
       row2.forEach( (d) => {
           row1.forEach( (k) => {
-         chartArea.append('rect')
-                    .attr('x', d)
-                    .attr('y', k)
-                    .attr('width', 80)
-                    .attr('height', 80)
-                    .attr('stroke', 'black')
-                    .attr('fill', '#d3d3d3');
+              chartArea.append('rect')
+                        .attr('x', d)
+                        .attr('y', k)
+                        .attr('width', 80)
+                        .attr('height', 80)
+                        .attr('stroke', 'black')
+                        .attr('fill', '#d3d3d3');
         })
       });
 
@@ -130,8 +129,102 @@
                      .attr("transform", `translate(${margins1.left},${margins1.top})`);
       })
 
+      const chesspieces = ['♔','♕','♖','♘','♙','♚','♛','♜','♝','♞','♟︎'];
+      const chesspieces_black = ['♜', '♞','♝','♛','♚','♝','♞','♜'];
+      const chesspieces_white = ['♖','♘','♙','♕','♔','♙','♘','♖'];
 
+      // row of black pieces
+      for(let x = 0; x < 8; x++) {
+          let chesspiece_id = 'piece' + letters[x].concat(8);
+          chartArea.append('text')
+                   .attr('id', chesspiece_id)
+                   .attr('x', axes[x]+40)
+                   .attr('y', 40)
+                   .text(chesspieces_black[x])
+                   .attr("text-anchor", 'middle')
+                   .attr("dominant-baseline", "middle")
+                   .attr('font-size',"3em")
+       }
 
+       // row of black pawns
+       for(let x = 0; x < 8; x++) {
+           let chesspiece_id = 'piece' + letters[x].concat(7);
+           chartArea.append('text')
+                    .attr('id', chesspiece_id)
+                    .attr('x', axes[x]+40)
+                    .attr('y', 130)
+                    .text('♟︎')
+                    .attr("text-anchor", 'middle')
+                    .attr("dominant-baseline", "middle")
+                    .attr('font-size',"3em")
+        }
+
+        // row of white pawns
+        for(let x = 0; x < 8; x++) {
+            let chesspiece_id = 'piece' + letters[x].concat(2);
+            chartArea.append('text')
+                     .attr('id', chesspiece_id)
+                     .attr('x', axes[x]+40)
+                     .attr('y', 520)
+                     .text('♙')
+                     .attr("text-anchor", 'middle')
+                     .attr("dominant-baseline", "middle")
+                     .attr('font-size',"3em")
+         }
+
+         // row of white pieces
+         for(let x = 0; x < 8; x++) {
+             let chesspiece_id = 'piece' + letters[x].concat(1);
+             chartArea.append('text')
+                      .attr('id', chesspiece_id)
+                      .attr('x', axes[x]+40)
+                      .attr('y', 600)
+                      .text(chesspieces_white[x])
+                      .attr("text-anchor", 'middle')
+                      .attr("dominant-baseline", "middle")
+                      .attr('font-size',"3em")
+          }
+
+          // mouseover interactions
+          const opening_pawns = ['#pieceA2','#pieceB2', '#pieceC2','#pieceD2',
+          '#pieceE2','#pieceF2','#pieceG2','#pieceH2',];
+          const opening_space = ['rect#A3', 'rect#B3', 'rect#C3', 'rect#D3',
+          'rect#E3', 'rect#F3', 'rect#G3', 'rect#H3', ];
+
+          const pawn_probability = [];
+          opening_pawns.forEach( (d,i) => {
+              d3.select(d).on("mouseover", function() {
+                  d3.select(opening_space[i])
+                    .attr("fill","green")
+                    .attr("opacity", .5)
+                    .raise();
+                  d3.select(this)
+                    .attr("fill", "green");
+                  let pawn_probability_id = opening_pawns[i] + 'prob';
+                    pawn_probability.push(pawn_probability_id);
+                    chartArea.append('text')
+                             .attr('id', pawn_probability_id)
+                             .attr('x', axes[i]+40)
+                             .attr('y', 440)
+                             .attr("text-anchor", 'middle')
+                             .attr("dominant-baseline", "middle")
+                             .text(data[i].online_white_odds);
+                  d3.select(pawn_probability[i])
+                    .style("visibility",'visible')
+                    .raise();
+                    console.log(pawn_probability[i]);
+              })
+
+              d3.select(d).on("mouseout", function() {
+                  d3.select(opening_space[i])
+                    .attr("fill","none")
+                    .raise();
+                  d3.select(this)
+                    .attr("fill", "black");
+                  d3.select(pawn_probability[i])
+                    .style('visibility', 'hidden');
+              })
+          })
 
 
 
