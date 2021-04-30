@@ -14,3 +14,6 @@ output_df = output_df.rename_axis("id")
 output_df.to_csv('rat_data.csv')
 
 # NYC Property Sales source: https://www.kaggle.com/johnshuford/new-york-city-property-sales
+# Construct read_csv statement for looping over multiple csvs
+years = [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]
+boroughs = ['Bronx/Bronx', 'Brooklyn/Brooklyn', 'Manhattan/Manhattan', 'Queens/Queens', 'StatenIsland/StatenIsland']
