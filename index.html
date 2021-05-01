@@ -1,7 +1,10 @@
+<!DOCTYPE html>
+
 <html>
 <head>
     <meta charset="utf-8">
     <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
     <title>Project 2</title>
 
     <style>
@@ -39,7 +42,7 @@
     <svg id="nyc" height="610" width="975" style="border: 2px gray solid"></svg>
 
     <script>
-    
+
     // Define svg and constants
     const svg = d3.select("#nyc");
     const width = svg.attr("width");
@@ -48,28 +51,53 @@
     const mapWidth = width - margin.left - margin.right;
     const mapHeight = height - margin.top - margin.bottom;
     const map = svg.append("g").attr("transform",`translate(${margin.left},${margin.top})`);
-    
+
     // Use async function to build map
     const requestData = async function() {
         // Retreive data
         // Rat Sighting data source: https://www.kaggle.com/new-york-city/nyc-rat-sightings
-        rat_data = await d3.csv("rat_data.csv");
+        const rat_data = await d3.csv("rat_data.csv");
+        const property_data =  await d3.csv("sale_data.csv");
+        const map_data = await d3.json("map_data.geojson");
         // sale_data = await d3.csv("sale_data.csv");
         console.log(rat_data);
+        console.log(property_data);
+        console.log(map_data);
+
+        // map_data retrieved from https://data.cityofnewyork.us/Health/Modified-Zip-Code-Tabulation-Areas-MODZCTA-/pri4-ifjk
 
         // NOTE - - - NEED NYC json! Ideally split by zip codes
-        // projection and path of nyc 
-        var projection;
-        // var path = d3.geoPath().projection(projection);
+        // projection and path of nyc
+
+        var zip_codes = topojson.feature(map_data, map_data.features);
+        var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], zip_codes);
+        var path = d3.geoPath().projection(projection);
+
+        map.selectAll("path.zip_codes").data(zip_codes)
+             .join("path")
+             .attr("class", "zip_codes")
+             .attr("d", path);
 
         // NOTE  - - - Depending on how we map out nyc, we can count #rats by zip/borough in the foreach loop below (could be good for an additional barplot/pie chart)
         rat_data.forEach( (d, i) => {
             // use projection to convert longitude and latitude into pixels
-            // d.position = projection( [d.longitude, d.latitude])
+            d.position = projection( [d.longitude, d.latitude])
 
         });
 
-    }
+
+        // plotting rat data on the map
+
+    //     map.selectAll("circle.dot").data(rat_data)
+    //          .join("circle")
+    //          .attr("class","dot")
+    //          .attr("r", 2)
+    //          .attr("fill", "forestgreen")
+    //          .attr("opacity", 0.2)
+    //          .attr("cx", d => d.position[0])
+    //          .attr("cy", d => d.position[1]);
+    //
+}
     requestData();
     </script>
 
