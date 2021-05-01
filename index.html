@@ -33,7 +33,7 @@
         }
 
         #slider {
-        width: 80%;
+        width: 100%;
         height: 15px;
         border-radius: 5px;
         opacity: 0.7;
@@ -45,12 +45,18 @@
           display: flex;
           justify-content: space-between;
           color: black;
-          width: 80%;
         }
 
-input {
-  width: 50%;
-}
+        #slider_div {
+            width: 700px;
+            margin: 0px auto;
+        }
+
+        .row {
+            display: flex;
+            flex-direction: row;
+            margin: 0px;
+        }
 
     </style>
 
@@ -60,21 +66,23 @@ input {
     <h1>New York City Property Prices and Rat Sightings</h1>
     <h2>Visualization Created By: Connie Huang (ch653) and Hunter Greene (hjg43)</h2>
     <p>This visualization compares annual rat sightings across New York City to _____.</p><hr />
-    <svg id="nyc" height="850" width="850" style="border: 2px gray solid"></svg>
-
-    <div id="slider_div">
-        <p id="slider_text"> View rat sightings by year </p>
-        <input type="range" id="slider" name="slider" list="year_labels" min="2010" max="2017" step="1">
-        <datalist id="year_labels">
-          <option value="2010" label="2010"></option>
-          <option value="2011" label="2011"></option>
-          <option value="2012" label="2012"></option>
-          <option value="2013" label="2013"></option>
-          <option value="2014" label="2014"></option>
-          <option value="2015" label="2015"></option>
-          <option value="2016" label="2016"></option>
-          <option value="2017" label="2017"></option>
-        </datalist>
+    
+    <div class="row">
+        <svg id="nyc" height="850" width="850" style="border: 2px gray solid"></svg>
+        <div id="slider_div">
+            <p id="slider_text"> View rat sightings by year </p>
+            <input type="range" id="slider" name="slider" list="year_labels" min="2010" max="2017" step="1">
+            <datalist id="year_labels">
+            <option value="2010" label="2010"></option>
+            <option value="2011" label="2011"></option>
+            <option value="2012" label="2012"></option>
+            <option value="2013" label="2013"></option>
+            <option value="2014" label="2014"></option>
+            <option value="2015" label="2015"></option>
+            <option value="2016" label="2016"></option>
+            <option value="2017" label="2017"></option>
+            </datalist>
+        </div>
     </div>
 
     <script>
@@ -127,8 +135,8 @@ input {
 
         // Function for updating map by selected year
         function updateMap(yearKey) {
-
             // Select rat data and sales based on yearKey
+            console.log(yearKey);
             let ratCount = {};
             let saleCount = {};
             if (yearKey === "All") {
@@ -150,8 +158,22 @@ input {
                 }
 
             }
-            console.log(ratCount);
-            console.log(saleCount);
+            else {
+                rat_data.forEach( row => {
+                    if (parseInt(row.year) === parseInt(yearKey)){
+                        if ( ratCount[row.zip] === undefined) {
+                            ratCount[row.zip] = row.count;
+                        } 
+                        else { ratCount[row.zip] += row.count; }
+                }});
+                property_data.forEach( row => {
+                    if (parseInt(row.year) === parseInt(yearKey)){
+                        if ( saleCount[row.zip] === undefined) {
+                            saleCount[row.zip] = row.price;
+                        }
+                        else { saleCount[row.zip] += row.price; }
+                }});
+            }
 
             // Create color matrix and scales
             // Color matrix source: https://www.joshuastevens.net/cartography/make-a-bivariate-choropleth-map/
@@ -180,9 +202,8 @@ input {
         // NOTE -- Insert slider here
         updateMap("All");
         d3.select("#slider").on("input", function() {
-            updateMap(this.value)
+            updateMap(this.value);
         })
-        console.log("success");
 
     }
     requestData();
