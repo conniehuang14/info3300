@@ -31,6 +31,22 @@
         hr {
             margin: 30px auto;
         }
+
+        .zip_code {
+            fill: #ddd;
+        }
+
+        .outline {
+            stroke: black;
+            stroke-width: 1px;
+            fill: none;
+        }
+
+        .dot {
+            fill: #f86891;
+            opacity: 0.2;
+        }
+
     </style>
 
 </head>
@@ -39,7 +55,7 @@
     <h1>New York City Property Prices and Rat Sightings</h1>
     <h2>Visualization Created By: Connie Huang (ch653) and Hunter Greene (hjg43)</h2>
     <p>This visualization compares annual rat sightings across New York City to _____.</p><hr />
-    <svg id="nyc" height="610" width="975" style="border: 2px gray solid"></svg>
+    <svg id="nyc" height="850" width="850" style="border: 2px gray solid"></svg>
 
     <script>
 
@@ -57,47 +73,81 @@
         // Retreive data
         // Rat Sighting data source: https://www.kaggle.com/new-york-city/nyc-rat-sightings
         const rat_data = await d3.csv("rat_data.csv");
+        // Property Sales data source: https://www.kaggle.com/johnshuford/new-york-city-property-sales
         const property_data =  await d3.csv("sale_data.csv");
-        const map_data = await d3.json("map_data.geojson");
-        // sale_data = await d3.csv("sale_data.csv");
+        // Map Data source: https://data.beta.nyc/dataset/nyc-zip-code-tabulation-areas/resource/6df127b1-6d04-4bb7-b983-07402a2c3f90?view_id=009db939-a288-49db-96f2-8f644d269e08
+        // Reshaped to topojson, source: https://mapshaper.org/
+        const map_data = await d3.json("nyc_zip_map.json");
+
+        // Map Data source: https://earthworks.stanford.edu/catalog/nyu_2451_34509
+
+        // NOTE - - - old, delete if other data works better; Map data source: https://data.cityofnewyork.us/Health/Modified-Zip-Code-Tabulation-Areas-MODZCTA-/pri4-ifjk
+        // const map_data = await d3.json("map_data.geojson");
+
         console.log(rat_data);
         console.log(property_data);
         console.log(map_data);
 
-        // map_data retrieved from https://data.cityofnewyork.us/Health/Modified-Zip-Code-Tabulation-Areas-MODZCTA-/pri4-ifjk
-
-        // NOTE - - - NEED NYC json! Ideally split by zip codes
         // projection and path of nyc
-
-        var zip_codes = topojson.feature(map_data, map_data.features);
+        var zip_codes = topojson.feature(map_data, map_data.objects.nyc_zip_map);
+        var zip_codes_mesh = topojson.mesh(map_data, map_data.objects.nyc_zip_map);
         var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], zip_codes);
         var path = d3.geoPath().projection(projection);
+        console.log(zip_codes);
 
-        map.selectAll("path.zip_codes").data(zip_codes)
+        // Draw zip codes and outlines
+        map.selectAll("path.zip_codes").data(zip_codes.features)
              .join("path")
-             .attr("class", "zip_codes")
+             .attr("class", "zip_code")
              .attr("d", path);
+        
+        map.append("path").datum(zip_codes_mesh)
+            .attr("class", "outline")
+            .attr("d", path)
 
         // NOTE  - - - Depending on how we map out nyc, we can count #rats by zip/borough in the foreach loop below (could be good for an additional barplot/pie chart)
+        
+        // Convert latitude and longitude to pixels
         rat_data.forEach( (d, i) => {
             // use projection to convert longitude and latitude into pixels
-            d.position = projection( [d.longitude, d.latitude])
-
+            d.position = projection( [d.longitude, d.latitude]);
         });
+        
+        // Function for updating map by selected year
+        function updateMap(yearKey) {
 
+            // Select rat data and sales based on yearKey
+            let rat_by_year = {};
+            let sales_by_year = {};
+            if (yearKey === "All") {
+                rat_by_year = rat_data;
+                sales_by_year = property_data;
+            }
 
-        // plotting rat data on the map
+            // Draw rat datapoints
+            map.selectAll("circle.dot").data(rat_by_year)
+              .join("circle")
+              .attr("class", "dot")
+              .attr("r", 1)
+               .attr("cx", d => d.position[0])
+              .attr("cy", d => d.position[1]);
 
-    //     map.selectAll("circle.dot").data(rat_data)
-    //          .join("circle")
-    //          .attr("class","dot")
-    //          .attr("r", 2)
-    //          .attr("fill", "forestgreen")
-    //          .attr("opacity", 0.2)
-    //          .attr("cx", d => d.position[0])
-    //          .attr("cy", d => d.position[1]);
-    //
-}
+            // Get property sale value lists and create color scale for sales
+           let saleVals = d3.map(sales_by_year, d => d.price);
+           console.log(saleVals)
+           const colorScale = d3.scaleQuantile()
+                                    .domain(Object.values(saleVals))
+                                    .range(["#fff","#c2e9eb","#54d6ed","#0e9bd8","#0052cc"]);
+        
+            // Recolor zip codes by sales
+            // map.selectAll(".zip_code")
+            //    .style("fill", d => colorScale( ))
+        }
+
+        // NOTE -- Insert slider here
+        updateMap("All");
+
+    }
     requestData();
     </script>
 
