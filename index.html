@@ -148,6 +148,7 @@ input {
                 for (let index in saleCount) {
                     saleCount[index] = Math.round(saleCount[index] / 8);
                 }
+            
             }
             console.log(ratCount);
             console.log(saleCount);
@@ -179,8 +180,9 @@ input {
         // NOTE -- Insert slider here
         updateMap("All");
         d3.select("#slider").on("input", function() {
-
+            updateMap(this.value)
         })
+        console.log("success");
 
     }
     requestData();
