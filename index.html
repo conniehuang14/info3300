@@ -126,24 +126,40 @@
                 });
                 // Average price
                 for (let index in saleCount) {
-                    saleCount[index] = Math.round(saleCount[index] / 8); 
+                    saleCount[index] = Math.round(saleCount[index] / 8);
                 }
             }
             console.log(ratCount);
             console.log(saleCount);
 
             // Get property sale value lists and create color scale for sales
-           // let ratVals = d3.map(ratCount, d => d.count);
+           //let ratVals = d3.map(ratCount, d => d.count);
+           //console.log(ratVals);
 
-           // let saleVals = d3.map(saleCount, d => d.price);
-           const colorScale = d3.scaleQuantile()
-                                    .domain(Object.values(saleVals))
-                                    .range(["#fff","#c2e9eb","#54d6ed","#0e9bd8","#0052cc"]);
+           //let saleVals = d3.map(saleCount, d => d.price);
+           // const colorScale = d3.scaleQuantile()
+           //                          .domain(Object.values(saleVals))
+           //                          .range(["#fff","#c2e9eb","#54d6ed","#0e9bd8","#0052cc"]);
 
             // Recolor zip codes by sales
             // map.selectAll(".zip_code")
             //    .style("fill", d => colorScale( ))
+            let colorMatrix = [ ["#e8e8e8", "#ace4e4", "#5ac8c8"],
+                                ["#dfb0d6", "#a5add3", "#5698b9"],
+                                ["#be64ac", "#8c62aa", "#3b4994"] ];
+            let ratScale = d3.scaleQuantile().domain(ratCount).range([0,1,2]);
+            let saleScale = d3.scaleQuantile().domain(saleCount).range([0,1,2]);
+
+            map.selectAll("path.rat_sales_combined").data(zip_codes.features)
+               .join("path")
+               .attr("class","rat_sales_combined")
+               .attr("d", path)
+               .attr("fill", d => {
+             return colorMatrix[ ratScale() ][ saleScale() ];
+            })
+
         }
+        // colorscale
 
         // NOTE -- Insert slider here
         updateMap("All");
