@@ -100,19 +100,19 @@
              .join("path")
              .attr("class", "zip_code")
              .attr("d", path);
-        
+
         map.append("path").datum(zip_codes_mesh)
             .attr("class", "outline")
             .attr("d", path)
 
         // NOTE  - - - Depending on how we map out nyc, we can count #rats by zip/borough in the foreach loop below (could be good for an additional barplot/pie chart)
-        
+
         // Convert latitude and longitude to pixels
         rat_data.forEach( (d, i) => {
             // use projection to convert longitude and latitude into pixels
             d.position = projection( [d.longitude, d.latitude]);
         });
-        
+
         // Function for updating map by selected year
         function updateMap(yearKey) {
 
@@ -129,16 +129,18 @@
               .join("circle")
               .attr("class", "dot")
               .attr("r", 1)
-               .attr("cx", d => d.position[0])
+              .attr("cx", d => d.position[0])
               .attr("cy", d => d.position[1]);
 
             // Get property sale value lists and create color scale for sales
+           let ratVals = d3.map(rat_by_year)
+
            let saleVals = d3.map(sales_by_year, d => d.price);
            console.log(saleVals)
            const colorScale = d3.scaleQuantile()
                                     .domain(Object.values(saleVals))
                                     .range(["#fff","#c2e9eb","#54d6ed","#0e9bd8","#0052cc"]);
-        
+
             // Recolor zip codes by sales
             // map.selectAll(".zip_code")
             //    .style("fill", d => colorScale( ))
