@@ -32,19 +32,10 @@
             margin: 30px auto;
         }
 
-        .zip_code {
-            fill: #ddd;
-        }
-
         .outline {
             stroke: black;
             stroke-width: 1px;
             fill: none;
-        }
-
-        .dot {
-            fill: #f86891;
-            opacity: 0.2;
         }
 
     </style>
@@ -133,9 +124,10 @@
             console.log(saleCount);
 
             // Create color matrix and scales
-            let colorMatrix = [ ["#e8e8e8", "#ace4e4", "#5ac8c8"],
-                                ["#dfb0d6", "#a5add3", "#5698b9"],
-                                ["#be64ac", "#8c62aa", "#3b4994"] ];
+            // Color matrix source: https://www.joshuastevens.net/cartography/make-a-bivariate-choropleth-map/
+            let colorMatrix = [ ["#e8e8e8", "#cbb8d7", "#9972af"],
+                                ["#e4d9ac", "#c8ada0", "#976b82"],
+                                ["#c8b35a", "#af8e53", "#804d36"] ];
             let ratScale = d3.scaleQuantile().domain(Object.values(ratCount)).range([0,1,2]);
             let saleScale = d3.scaleQuantile().domain(Object.values(saleCount)).range([0,1,2]);
 
@@ -148,7 +140,7 @@
                 // get each zip code's index in matrix, return no fill if missing a value
                 let ratIndex = ratScale(ratCount[d.properties.postalCode]);
                 let saleIndex = saleScale(saleCount[d.properties.postalCode]);
-                if (ratIndex === undefined | saleIndex === undefined) { return "";}
+                if (ratIndex === undefined | saleIndex === undefined) { return "white";}
                 else {return colorMatrix[ ratIndex ][ saleIndex ];}
             });
 
