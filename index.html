@@ -132,32 +132,22 @@
             console.log(ratCount);
             console.log(saleCount);
 
-            // Get property sale value lists and create color scale for sales
-           //let ratVals = d3.map(ratCount, d => d.count);
-           //console.log(ratVals);
-
-           //let saleVals = d3.map(saleCount, d => d.price);
-           // const colorScale = d3.scaleQuantile()
-           //                          .domain(Object.values(saleVals))
-           //                          .range(["#fff","#c2e9eb","#54d6ed","#0e9bd8","#0052cc"]);
-
-            // Recolor zip codes by sales
-            // map.selectAll(".zip_code")
-            //    .style("fill", d => colorScale( ))
+            // Create color matrix and scales
             let colorMatrix = [ ["#e8e8e8", "#ace4e4", "#5ac8c8"],
                                 ["#dfb0d6", "#a5add3", "#5698b9"],
                                 ["#be64ac", "#8c62aa", "#3b4994"] ];
             let ratScale = d3.scaleQuantile().domain(Object.values(ratCount)).range([0,1,2]);
             let saleScale = d3.scaleQuantile().domain(Object.values(saleCount)).range([0,1,2]);
 
+            // Implement color matrix
             map.selectAll("path.rat_sales_combined").data(zip_codes.features)
                .join("path")
                .attr("class","rat_sales_combined")
                .attr("d", path)
                .attr("fill", d => {
-                let ratIndex = ratScale();
-                let saleIndex = saleScale();
-                // Catch null values
+                // get each zip code's index in matrix, return no fill if missing a value
+                let ratIndex = ratScale(ratCount[d.properties.postalCode]);
+                let saleIndex = saleScale(saleCount[d.properties.postalCode]);
                 if (ratIndex === undefined | saleIndex === undefined) { return "";}
                 else {return colorMatrix[ ratIndex ][ saleIndex ];}
             });
