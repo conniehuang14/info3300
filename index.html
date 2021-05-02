@@ -197,6 +197,58 @@
                 else {return colorMatrix[ ratIndex ][ saleIndex ];}
             });
 
+            let legend = map.append("g").attr("class","legend")
+                             .attr("transform","translate(30,100) rotate(-45)");
+            // Make blocks of color according to colorMatrix
+            for (let i=0; i<colorMatrix.length; i++) {
+              for (let j=0; j<colorMatrix.length; j++) {
+                legend.append("rect")
+                      .attr("x", i*30)
+                      .attr("y", 60-j*30)
+                      .attr("width",30)
+                      .attr("height",30)
+                      .attr("fill", colorMatrix[i][j]);
+            }
+
+            legend.append("text").text("Rats Density")
+                  .attr("text-anchor","middle")
+                  .attr("transform","translate(45,110)")
+            legend.append("text").text("Property Price")
+                  .attr("text-anchor","middle")
+                  .attr("transform","translate(-20,45) rotate(90)")
+            map.append('defs').append('marker').attr('id', 'arrowhead')
+                   .attr('viewBox', [0, 0, 6, 6])
+                   .attr('refX', 0).attr('refY', 3)
+                   .attr('markerWidth', 6).attr('markerHeight', 6)
+                   .attr('orient', 'auto-start-reverse')
+                   .append('path')
+                   .attr('d', d3.line()([[0, 0], [0, 6], [6, 3]]))
+                    .attr('fill', 'black');
+
+            //arrows
+            legend.append("path")
+                 .attr('marker-start', 'url(#arrowhead)')
+                 .attr('marker-end', 'url(#arrowhead)')
+                 .attr("d", d3.line()([[65,90],[0,90],[0,25]]))
+                 .attr("fill","none")
+                 .attr("stroke-width", 2)
+                 .attr('stroke', 'black')
+                 .raise();
+            };
+
+            // Make blocks of color according to colorMatrix
+            for (let i=0; i<colorMatrix.length; i++) {
+              for (let j=0; j<colorMatrix.length; j++) {
+                legend.append("rect")
+                      .attr("x", i*30)
+                      .attr("y", 60-j*30)
+                      .attr("width",30)
+                      .attr("height",30)
+                      .attr("fill", colorMatrix[i][j]);
+              }
+          }
+
+
         }
 
         // Set to default of all years (2009), update map when slider used
@@ -204,6 +256,7 @@
         d3.select("#slider").on("input", function() {
             updateMap(this.value);
         })
+
 
     }
     requestData();
