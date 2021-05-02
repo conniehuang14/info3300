@@ -66,12 +66,12 @@
     <h1>New York City Property Prices and Rat Sightings</h1>
     <h2>Visualization Created By: Connie Huang (ch653) and Hunter Greene (hjg43)</h2>
     <p>This visualization compares annual rat sightings across New York City to _____.</p><hr />
-    
+
     <div class="row">
         <svg id="nyc" height="850" width="850" style="border: 2px gray solid"></svg>
         <div id="slider_div">
-            <p id="slider_text"> View rat sightings by year </p>
-            <input type="range" id="slider" name="slider" list="year_labels" min="2009" max="2017" step="1">
+            <p id="slider_text"> View rat sightings and property sales price changes by year </p>
+            <input type="range" id="slider" name="slider" list="year_labels" min="2009" max="2017" step="1" value="1">
             <datalist id="year_labels">
             <option value="All" label="All  "></option>
             <option value="2010" label="2010"></option>
@@ -164,7 +164,7 @@
                     if (parseInt(row.year) === parseInt(yearKey)){
                         if ( ratCount[row.zip] === undefined) {
                             ratCount[row.zip] = row.count;
-                        } 
+                        }
                         else { ratCount[row.zip] += row.count; }
                 }});
                 property_data.forEach( row => {
