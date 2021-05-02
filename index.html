@@ -71,8 +71,9 @@
         <svg id="nyc" height="850" width="850" style="border: 2px gray solid"></svg>
         <div id="slider_div">
             <p id="slider_text"> View rat sightings by year </p>
-            <input type="range" id="slider" name="slider" list="year_labels" min="2010" max="2017" step="1">
+            <input type="range" id="slider" name="slider" list="year_labels" min="2009" max="2017" step="1">
             <datalist id="year_labels">
+            <option value="All" label="All  "></option>
             <option value="2010" label="2010"></option>
             <option value="2011" label="2011"></option>
             <option value="2012" label="2012"></option>
@@ -139,7 +140,7 @@
             console.log(yearKey);
             let ratCount = {};
             let saleCount = {};
-            if (yearKey === "All") {
+            if (yearKey === "2009") {
                 rat_data.forEach( row => {
                     if ( ratCount[row.zip] === undefined) {
                         ratCount[row.zip] = row.count;
@@ -197,10 +198,9 @@
             });
 
         }
-        // colorscale
 
-        // NOTE -- Insert slider here
-        updateMap("All");
+        // Set to default of all years (2009), update map when slider used
+        updateMap("2009");
         d3.select("#slider").on("input", function() {
             updateMap(this.value);
         })
