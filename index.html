@@ -120,6 +120,8 @@
         // projection and path of nyc
         var zip_codes = topojson.feature(map_data, map_data.objects.nyc_zip_map);
         var zip_codes_mesh = topojson.mesh(map_data, map_data.objects.nyc_zip_map);
+        console.log('mesh');
+        console.log(zip_codes_mesh);
         var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], zip_codes);
         var path = d3.geoPath().projection(projection);
         console.log(zip_codes);
@@ -128,7 +130,7 @@
         map.selectAll("path.zip_codes").data(zip_codes.features)
              .join("path")
              .attr("class", "zip_code")
-             .attr("d", path);
+             .attr("d", path)
 
         map.append("path").datum(zip_codes_mesh)
             .attr("class", "outline")
@@ -236,7 +238,6 @@
                  .raise();
             };
 
-            // Make blocks of color according to colorMatrix
             for (let i=0; i<colorMatrix.length; i++) {
               for (let j=0; j<colorMatrix.length; j++) {
                 legend.append("rect")
@@ -246,10 +247,36 @@
                       .attr("height",30)
                       .attr("fill", colorMatrix[i][j]);
               }
+
+              let mouseOver = function(d) {
+                  d3.selectAll(".zip")
+                    .style("opacity", .5)
+                  d3.select(this)
+                    .style("opacity", 1)
+                    .style("stroke", "black")
+            }
+
+              let mouseLeave = function(d) {
+                d3.selectAll(".zip")
+                  .style("opacity", .8)
+                d3.select(this)
+                  .transition()
+                  .duration(200)
+                  .style("stroke", "transparent")
+              }
+
+
+    map.append("g").on("mouseover", mouseOver )
+    .on("mouseleave", mouseLeave )
+
+
           }
 
 
+
+
         }
+
 
         // Set to default of all years (2009), update map when slider used
         updateMap("2009");
