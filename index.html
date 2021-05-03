@@ -301,7 +301,7 @@
                   .attr("transform","translate(-20,45) rotate(90)")
 
             // make marker for arrowheads and path for lines
-            map.append('defs').append('marker').attr('id', 'arrowhead')
+            svg.append('defs').append('marker').attr('id', 'arrowhead')
                    .attr('viewBox', [0, 0, 6, 6])
                    .attr('refX', 0).attr('refY', 3)
                    .attr('markerWidth', 6).attr('markerHeight', 6)
@@ -309,7 +309,6 @@
                    .append('path')
                    .attr('d', d3.line()([[0, 0], [0, 6], [6, 3]]))
                     .attr('fill', 'black');
-
             // make arrow lines
             legend.append("path")
                  .attr('marker-start', 'url(#arrowhead)')
