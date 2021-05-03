@@ -79,7 +79,10 @@
 <body>
     <h1>New York City Property Prices and Rat Sightings</h1>
     <h2>Visualization Created By: Connie Huang (ch653) and Hunter Greene (hjg43)</h2>
-    <p>This visualization compares annual rat sightings across New York City to _____.</p><hr />
+    <p>This visualization compares annual rat sightings to
+        property sales by zip code across New York City. The color of each zip code
+        corresponds to the number of rat sightings in each zip code and the average
+        sale price of properties in that zip code.</p> <hr />
 
     <div class="row">
         <svg id="nyc" height="850" width="850" style="border: 2px gray solid"></svg>
@@ -249,7 +252,7 @@
             legend.append("text").text("Property Price")
                   .attr("text-anchor","middle")
                   .attr("transform","translate(-20,45) rotate(90)")
-            
+
             // make marker for arrowheads and path for lines
             map.append('defs').append('marker').attr('id', 'arrowhead')
                    .attr('viewBox', [0, 0, 6, 6])
@@ -268,7 +271,7 @@
                  .attr("fill","none")
                  .attr("stroke-width", 2)
                  .attr('stroke', 'black')
-                 .raise();           
+                 .raise();
         }
 
         // mouseover outline
@@ -292,7 +295,7 @@
             let currentZipID = currentZip.datum().properties.postalCode.parseInt;
             console.log(currentZip.datum())
             //let zipCode = `Zip Code: ${d['zip']}`;
-        
+
             // Determine max width of frame
             //let maxWidth = Math.max ( stringLen(zipCode) )
             //frame.attr("width", maxWidth+20);
@@ -300,13 +303,13 @@
             // Append text
             textbox.append("text").text("Test")
                 .attr("x", 0).attr("y",10);
-            
-            
+
+
             // thicken zip code mesh
             var mo = topojson.mesh(map_data, map_data.objects.nyc_zip_map, function(a,b) {return a.properties.postalCode === currentZipID || b.properties.postalCode === currentZipID; });
             mousemesh.datum(mo).attr("d", path)
 
-        } 
+        }
 
         // Function mouseLeavesPlot clears tooltip when mouse leaves
         function mouseLeavesPlot() {
