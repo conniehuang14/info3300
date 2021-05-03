@@ -10,7 +10,7 @@
     <style>
         h1 {
             font-family: Helvetica, Arial, sans-serif;
-            margin-bottom: 0px;
+            margin: 0px;
         }
 
         h2 {
@@ -51,10 +51,16 @@
             font-family: Helvetica, Arial, sans-serif;
             width: 35%;
             margin: 0px auto;
+            font-size: 18px;
+            height: 140px;
+            background-color:#cbb8d7;
+            padding: 5px 20px;
+            border: white 5px solid;
         }
 
         p {
             font-family: Helvetica, Arial, sans-serif !important;
+            font-size: 18px;
             font-weight: bold;
         }
 
@@ -62,14 +68,46 @@
             display: flex;
             flex-direction: row;
             margin: 0px;
+            padding: 20px;
+            background-color: #c8ada0;
         }
 
         svg {
             background-color: white;
         }
 
-        body {
-            background-color: #c8ada0;
+        html body {
+            margin: 0px;
+            background-color:#cbb8d7;
+        }
+
+        .intro {
+            background-color: #cbb8d7;
+            padding: 10px;
+            border-bottom: white 10px double;
+        }
+
+        .outline {
+            stroke: black;
+            stroke-width: 1px;
+            fill: none;
+        }
+
+        g.mouseover rect {
+            fill:  #c8ada0;
+            stroke: #804d36;
+            stroke-width: 2px;
+        }
+
+        .mousemesh {
+            stroke: black;
+            stroke-width: 3px;
+            fill: none;
+        }
+
+        .textboxtext {
+            font-family: Helvetica, Arial, sans-serif !important;
+            font-size: 18px;
         }
 
     </style>
@@ -77,20 +115,25 @@
 </head>
 
 <body>
-    <h1>New York City Property Prices and Rat Sightings</h1>
-    <h2>Visualization Created By: Connie Huang (ch653) and Hunter Greene (hjg43)</h2>
-    <p>This visualization compares annual rat sightings to
+    <div class="intro">
+        <h1>New York City Property Prices and Rat Sightings</h1>
+        <h2>Visualization Created By: Connie Huang (ch653) and Hunter Greene (hjg43)</h2>
+        <p>This visualization compares annual rat sightings to
         property sales by zip code across New York City. The color of each zip code
         corresponds to the number of rat sightings in each zip code and the average
-        sale price of properties in that zip code.</p> <hr />
+        sale price of properties in that zip code. While the initial visualization represents
+        total rat sightings and average sales across the period from 2010 to 2017, the data is 
+        filterable by year.</p>
+    </div>
 
     <div class="row">
-        <svg id="nyc" height="850" width="850" style="border: 2px gray solid"></svg>
+        <svg id="nyc" height="850" width="850" style="border: 2px gray solid">
+        </svg>
         <div id="slider_div">
             <p id="slider_text"> View rat sightings and property sales price changes by year </p>
             <input type="range" id="slider" name="slider" list="year_labels" min="2009" max="2017" step="1" value="1">
             <datalist id="year_labels">
-            <option value="All" label="All  "></option>
+            <option value="All" label="All"></option>
             <option value="2010" label="2010"></option>
             <option value="2011" label="2011"></option>
             <option value="2012" label="2012"></option>
@@ -121,10 +164,17 @@
                         .attr("class", "frame")
                         .attr("x", 0).attr("y", 0)
                         .attr("rx", 5).attr("ry", 5)
-                        .attr("height", 130);
+                        .attr("height", 90)
+                        .attr("width", 325)
+                        .style("visibility", "hidden");
     const textbox = mouseover.append("g").attr("transform","translate(10,10)");
     // Use formatter to make numbers better in mouseover
     const format = d3.format(',d');
+
+    // Add text to svg explaining mouseover function
+    svg.append("text").text("Hover over Zip Code for Details")
+                .attr("class", "textboxtext")
+                .attr("x", 590).attr("y",height-10);
 
     // Use async function to build map
     const requestData = async function() {
@@ -137,34 +187,17 @@
         // Reshaped to topojson, source: https://mapshaper.org/
         const map_data = await d3.json("nyc_zip_map.json");
 
-        // Map Data source: https://earthworks.stanford.edu/catalog/nyu_2451_34509
-
-        // NOTE - - - old, delete if other data works better; Map data source: https://data.cityofnewyork.us/Health/Modified-Zip-Code-Tabulation-Areas-MODZCTA-/pri4-ifjk
-        // const map_data = await d3.json("map_data.geojson");
-
-        console.log(rat_data);
-        console.log(property_data);
-        console.log(map_data);
-
         // projection and path of nyc
         var zip_codes = topojson.feature(map_data, map_data.objects.nyc_zip_map);
         var zip_codes_mesh = topojson.mesh(map_data, map_data.objects.nyc_zip_map);
-        console.log('mesh');
-        console.log(zip_codes_mesh);
         var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], zip_codes);
         var path = d3.geoPath().projection(projection);
-        console.log(zip_codes);
 
-        // Draw zip codes and outlines
+        // Draw zip codes
         map.selectAll("path.zip_code").data(zip_codes.features)
              .join("path")
              .attr("class", "zip_code")
              .attr("d", path)
-        console.log(map.selectAll(".zip_code"))
-
-        map.append("path").datum(zip_codes_mesh)
-            .attr("class", "outline")
-            .attr("d", path)
 
         // Function for updating map by selected year
         function updateMap(yearKey) {
@@ -230,6 +263,20 @@
                 else {return colorMatrix[ ratIndex ][ saleIndex ];}
             });
 
+            // Draw outlines
+            map.append("path").datum(zip_codes_mesh)
+            .attr("class", "outline")
+            .attr("d", path)
+
+            // add ratCount and sales to zip code features
+            zip_codes.features.forEach( (d, i) => {
+                if (ratCount[d.properties.postalCode] === undefined) {
+                    d.properties.ratCount = "Data Unavailable";
+                } else {d.properties.ratCount = format(ratCount[d.properties.postalCode]);}
+                if (saleCount[d.properties.postalCode] === undefined) {
+                    d.properties.salePrice = "Data Unavailable";
+                } else {d.properties.salePrice = "$"+format(saleCount[d.properties.postalCode]);}
+            });
 
             // Construct legend and make blocks of color according to colorMatrix
             let legend = map.append("g").attr("class","legend")
@@ -275,25 +322,26 @@
         }
 
         // mouseover outline
-        mousemesh = map.append("path")
-                    .attr("class", "mouseover outline")
-                    .attr("d","");
-        console.log("test")
-        console.log(d3.selectAll(".zip_code"))
+        mousemesh = svg.append("path")
+                    .attr("class", "mousemesh")
+                    .attr("d","")
+                    .attr("transform",`translate(${margin.left},${margin.top})`);
         d3.selectAll(".zip_code").on("mouseenter", mouseEntersPlot);
         d3.selectAll(".zip_code").on("mouseout", mouseLeavesPlot);
 
         // function mouseEntersPlot will be called to update tooltip frame
         function mouseEntersPlot() {
-            console.log("mouse entered plot")
             // make textbox visible and clear potential old writing
-            textbox.style("visibility", "visible")
+            textbox.style("visibility", "visible");
+            frame.style("visibility", "visible");
             textbox.html('');
 
             // Find this zip's SVG element
             let currentZip = d3.select(this);
-            let currentZipID = currentZip.datum().properties.postalCode.parseInt;
-            console.log(currentZip.datum())
+            let currentZipID = "Zip Code: "+ currentZip.datum().properties.postalCode;
+            let currentZipBorough = "Borough: "+ currentZip.datum().properties.borough;
+            let currentZipRats = "Rat Sightings: "+ currentZip.datum().properties.ratCount;
+            let currentZipSale = "Avg Property Sale: "+ currentZip.datum().properties.salePrice;
             //let zipCode = `Zip Code: ${d['zip']}`;
 
             // Determine max width of frame
@@ -301,20 +349,25 @@
             //frame.attr("width", maxWidth+20);
 
             // Append text
-            textbox.append("text").text("Test")
+            textbox.append("text").text(currentZipID).attr("class", "textboxtext")
                 .attr("x", 0).attr("y",10);
-
+            textbox.append("text").text(currentZipBorough).attr("class", "textboxtext")
+                .attr("x", 0).attr("y",30);
+            textbox.append("text").text(currentZipRats).attr("class", "textboxtext")
+                .attr("x", 0).attr("y",50);
+            textbox.append("text").text(currentZipSale).attr("class", "textboxtext")
+                .attr("x", 0).attr("y",70);
 
             // thicken zip code mesh
-            var mo = topojson.mesh(map_data, map_data.objects.nyc_zip_map, function(a,b) {return a.properties.postalCode === currentZipID || b.properties.postalCode === currentZipID; });
+            var mo = topojson.mesh(map_data, map_data.objects.nyc_zip_map, function(a,b) {return a.properties.postalCode === currentZip.datum().properties.postalCode || b.properties.postalCode === currentZip.datum().properties.postalCode; });
             mousemesh.datum(mo).attr("d", path)
 
         }
 
         // Function mouseLeavesPlot clears tooltip when mouse leaves
         function mouseLeavesPlot() {
-            console.log("mouse left plot")
             textbox.style("visibility", "hidden");
+            frame.style("visibility", "hidden")
             mousemesh.attr("d", "");
         }
 
