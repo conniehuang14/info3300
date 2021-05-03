@@ -157,6 +157,7 @@
              .join("path")
              .attr("class", "zip_code")
              .attr("d", path)
+        console.log(map.selectAll(".zip_code"))
 
         map.append("path").datum(zip_codes_mesh)
             .attr("class", "outline")
@@ -288,7 +289,7 @@
 
             // Find this zip's SVG element
             let currentZip = d3.select(this);
-            let currentZipID = currentZip.datum();
+            let currentZipID = currentZip.datum().properties.postalCode.parseInt;
             console.log(currentZip.datum())
             //let zipCode = `Zip Code: ${d['zip']}`;
         
